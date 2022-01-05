@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# starting sshd process
+sed -i "s/SSH_PORT/$SSH_PORT/g" /etc/ssh/sshd_config
+/usr/sbin/sshd
+
 if [ -n "$ICECAST_SOURCE_PASSWORD" ]; then
     sed -i "s/<source-password>[^<]*<\/source-password>/<source-password>$ICECAST_SOURCE_PASSWORD<\/source-password>/g" /etc/icecast.xml
 fi
