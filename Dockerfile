@@ -3,12 +3,14 @@ FROM alpine:latest
 RUN addgroup -S icecast && \
     adduser -S icecast
     
-RUN apk add --update \
+RUN apk add --no-cache \
+        bash \
+        ezstream \
         icecast \
         mailcap \ 
         openssh-server \
-        openssh-keygen && \
-    rm -rf /var/cache/apk/*
+        openssh-keygen \
+        tini
 
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -33,7 +35,9 @@ RUN chmod -R +x /tmp/ssh_setup.sh \
 
 ENV SSH_PORT 2222
 
+# Icecast
+COPY icecast.xml /etc/
+
 EXPOSE 2222 8000
 VOLUME ["/var/log/icecast"]
-ENTRYPOINT ["/entrypoint.sh"]
-CMD icecast -c /etc/icecast.xml
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]

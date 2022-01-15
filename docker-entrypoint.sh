@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -e
 
 # starting sshd process
 sed -i "s/SSH_PORT/$SSH_PORT/g" /etc/ssh/sshd_config
@@ -32,4 +34,13 @@ if [ -n "$ICECAST_MAX_SOURCES" ]; then
     sed -i "s/<sources>[^<]*<\/sources>/<sources>$ICECAST_MAX_SOURCES<\/sources>/g" /etc/icecast.xml
 fi
 
-exec "$@"
+icecast -c /etc/icecast.xml &
+
+sleep 5s
+
+cp -a /rcfm/ezstream /ezstream
+chmod 0600 /ezstream/*
+cd /ezstream
+ezstream -c /ezstream/ezstream.xml &
+
+wait -n
